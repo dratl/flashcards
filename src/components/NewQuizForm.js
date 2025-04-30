@@ -24,7 +24,7 @@ export default function NewQuizForm() {
 
     const quizId = uuidv4();
     const cardIds = [];
-    
+
     // Create cards and collect their IDs
     cards.forEach((card) => {
       const cardId = uuidv4();
@@ -36,12 +36,12 @@ export default function NewQuizForm() {
       cardIds.push(cardId);
     });
 
-    // Create the quiz with associated card IDs
+    // Create the quiz with the array of card IDs
     dispatch(addQuiz({
       id: quizId,
       name: name,
       topicId: topicId,
-      cardIds: [] // Passing empty array
+      cardIds: cardIds // Now passing the actual card IDs array
     }));
 
     // Associate quiz with its topic
@@ -78,11 +78,11 @@ export default function NewQuizForm() {
           value={name}
           onChange={(e) => setName(e.currentTarget.value)}
           placeholder="Quiz Title"
+          required
         />
         <select
           id="quiz-topic"
           onChange={(e) => setTopicId(e.currentTarget.value)}
-          placeholder="Topic"
           value={topicId}
           required
         >
@@ -97,24 +97,18 @@ export default function NewQuizForm() {
           <div key={index} className="card-front-back">
             <input
               id={`card-front-${index}`}
-              value={cards[index].front}
-              onChange={(e) =>
-                updateCardState(index, "front", e.currentTarget.value)
-              }
+              value={card.front}
+              onChange={(e) => updateCardState(index, "front", e.currentTarget.value)}
               placeholder="Front"
               required
             />
-
             <input
               id={`card-back-${index}`}
-              value={cards[index].back}
-              onChange={(e) =>
-                updateCardState(index, "back", e.currentTarget.value)
-              }
+              value={card.back}
+              onChange={(e) => updateCardState(index, "back", e.currentTarget.value)}
               placeholder="Back"
               required
             />
-
             <button
               onClick={(e) => removeCard(e, index)}
               className="remove-card-button"
