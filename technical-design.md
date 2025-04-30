@@ -416,6 +416,117 @@ Lastly, import your selector in src/features/quizzes/Quizzes.js, src/features/qu
 
 - The Topic component should replace the empty object assigned to quizzes with the selector.
 
+### Quizzes.js
+
+```js
+
+import React from "react";
+import { useSelector } from "react-redux";
+import { Link } from "react-router-dom";
+import ROUTES from "../../app/routes";
+// import quiz selector
+
+export default function Quizzes() {
+  const quizzes = {}; // replace this with a call to your selector to get all the quizzes in state
+  return (
+    <section className="center">
+      <h1>Quizzes</h1>
+      <ul className="quizzes-list">
+        {Object.values(quizzes).map((quiz) => (
+          <Link key={quiz.id} to={ROUTES.quizRoute(quiz.id)}>
+            <li className="quiz">{quiz.name}</li>
+          </Link>
+        ))}
+      </ul>
+      <Link to={ROUTES.newQuizRoute()} className="button">
+        Create New Quiz
+      </Link>
+    </section>
+  );
+}
+
+```
+
+### Quiz.js
+
+```js
+
+import React from "react";
+import { useSelector } from "react-redux";
+import { Link, useParams, Navigate } from "react-router-dom";
+import Card from "../cards/Card";
+import ROUTES from "../../app/routes";
+// import quiz selector
+
+export default function Quiz() {
+  const quizzes = {}; // replace this with a call to your selector to get all the quizzes in state
+  const { quizId } = useParams();
+  const quiz = quizzes[quizId];
+
+  if(!quiz) {
+    return <Navigate to={ROUTES.quizzesRoute()} replace/>
+  }
+
+
+  return (
+    <section>
+      <h1>{quiz.name}</h1>
+      <ul className="cards-list">
+        {quiz.cardIds.map((id) => (
+          <Card key={id} id={id} />
+        ))}
+      </ul>
+      <Link to={ROUTES.newQuizRoute()} className="button center">
+        Create a New Quiz
+      </Link>
+    </section>
+  );
+}
+
+```
+
+### Topic.js
+
+```js
+
+import React from "react";
+import { useSelector } from "react-redux";
+import { Link, useParams, Navigate } from "react-router-dom";
+import ROUTES from "../../app/routes";
+// import selectors
+
+export default function Topic() {
+  const topics = {};  // replace with selector
+  const quizzes = {}; // replace with selector
+  const { topicId } = useParams();
+  const topic = topics[topicId];
+
+  if(!topic) {
+    return <Navigate to={ROUTES.topicsRoute()} replace/>
+  }
+  
+  const quizzesForTopic = topic.quizIds.map((quizId) => quizzes[quizId]);
+
+  return (
+    <section>
+      <img src={topic.icon} alt="" className="topic-icon" />
+      <h1>{topic.name}</h1>
+      <ul className="quizzes-list">
+        {quizzesForTopic.map((quiz) => (
+          <li className="quiz" key={quiz.id}>
+            <Link to={ROUTES.quizRoute(quiz.id)}>{quiz.name}</Link>
+          </li>
+        ))}
+      </ul>
+      <Link to="/quizzes/new" className="button center">
+        Create a New Quiz
+      </Link>
+    </section>
+  );
+}
+
+```
+
 ## Task 14.
 
 Great work! Next, in the src/features/cards directory, create a new file containing slice for cards that:

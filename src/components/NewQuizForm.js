@@ -3,7 +3,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 import ROUTES from "../app/routes";
-// import selectors
 import { selectTopics } from "../features/topics/topicsSlice";
 import { addQuiz } from "../features/quizzes/quizzesSlice";
 import { addQuizId } from "../features/topics/topicsSlice";
@@ -18,29 +17,27 @@ export default function NewQuizForm() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (name.length === 0) {
+    if (name.length === 0 || !topicId) {
       return;
     }
 
-    const cardIds = cards.map(() => uuidv4()); // Generate IDs for cards
-
-    // create the new cards here and add each card's id to cardIds
-    // create the new quiz here
-
     const quizId = uuidv4();
-
-    // dispatch add quiz action 
+    
+    // Create the quiz with empty cardIds array for now
     dispatch(addQuiz({
       id: quizId,
-      name,
-      topicId,
-      cardIds,
+      name: name,
+      topicId: topicId,
+      cardIds: [] // Passing empty array as specified in task
     }));
-    dispatch(addQuizId({ 
+
+    // Associate quiz with its topic
+    dispatch(addQuizId({
       quizId: quizId,
       topicId: topicId
     }));
-    navigate(ROUTES.quizzesRoute())
+
+    navigate(ROUTES.quizzesRoute());
   };
 
   const addCardInputs = (e) => {
