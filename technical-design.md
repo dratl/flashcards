@@ -538,6 +538,7 @@ Great work! Next, in the src/features/cards directory, create a new file contain
 - Has an addCard action. This action will receive a payload of the form { id: '123', front: 'front of card', back: 'back of card'}.
 
 - Has a selector that returns a card with the given id.
+
 - Is added to the store.
 
 ## Task 15.
