@@ -683,4 +683,27 @@ To test that your code is working, create a new quiz with some cards. Navigate t
 
 Now that you can add new cards, you’ll need to display cards on the individual quiz page. The Quiz component renders a list of Card components, so in src/features/cards/Card.js, import your cards selector and use it to access all the cards in state.
 
+## Card.js
+
+```js
+
+import React, { useState } from "react";
+import { useSelector } from "react-redux";
+// import selector
+
+export default function Card({ id }) {
+  const card = {}; // replace this with a call to your selector to get a card by id
+  const [flipped, setFlipped] = useState(false);
+
+  return (
+    <li>
+      <button className="card" onClick={(e) => setFlipped(!flipped)}>
+        {flipped ? card.back : card.front}
+      </button>
+    </li>
+  );
+}
+
+```
+
 ## Task 18.
