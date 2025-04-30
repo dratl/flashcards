@@ -6,6 +6,7 @@ import ROUTES from "../app/routes";
 import { selectTopics } from "../features/topics/topicsSlice";
 import { addQuiz } from "../features/quizzes/quizzesSlice";
 import { addQuizId } from "../features/topics/topicsSlice";
+import { addCard } from "../features/cards/cardsSlice";
 
 export default function NewQuizForm() {
   const [name, setName] = useState("");
@@ -17,18 +18,30 @@ export default function NewQuizForm() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (name.length === 0 || !topicId) {
+    if (name.length === 0 || !topicId || cards.length === 0) {
       return;
     }
 
     const quizId = uuidv4();
+    const cardIds = [];
     
-    // Create the quiz with empty cardIds array for now
+    // Create cards and collect their IDs
+    cards.forEach((card) => {
+      const cardId = uuidv4();
+      dispatch(addCard({
+        id: cardId,
+        front: card.front,
+        back: card.back
+      }));
+      cardIds.push(cardId);
+    });
+
+    // Create the quiz with associated card IDs
     dispatch(addQuiz({
       id: quizId,
       name: name,
       topicId: topicId,
-      cardIds: [] // Passing empty array as specified in task
+      cardIds: [] // Passing empty array
     }));
 
     // Associate quiz with its topic
@@ -71,6 +84,7 @@ export default function NewQuizForm() {
           onChange={(e) => setTopicId(e.currentTarget.value)}
           placeholder="Topic"
           value={topicId}
+          required
         >
           <option value="">Topic</option>
           {Object.values(topics).map((topic) => (
@@ -88,6 +102,7 @@ export default function NewQuizForm() {
                 updateCardState(index, "front", e.currentTarget.value)
               }
               placeholder="Front"
+              required
             />
 
             <input
@@ -97,6 +112,7 @@ export default function NewQuizForm() {
                 updateCardState(index, "back", e.currentTarget.value)
               }
               placeholder="Back"
+              required
             />
 
             <button

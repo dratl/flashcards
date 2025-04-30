@@ -549,6 +549,130 @@ Lastly, connect your addCard action creator to the new quiz form. In src/compone
 
 - Store the id you create for each card in the cardIds array we’ve provided for you. Remember, your action creator expects to receive a payload of the form { id: '123', front: 'front of card', back: 'back of card'}. You want to collect all the cardIds in an array so that you can pass them to the action creator that generates new quizzes. To use uuidv4 to create an id, call the function like so: uuidv4().
 
+### NewQuizForm.js
+
+```js
+
+import React, { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { v4 as uuidv4 } from "uuid";
+import ROUTES from "../app/routes";
+import { selectTopics } from "../features/topics/topicsSlice";
+import { addQuiz } from "../features/quizzes/quizzesSlice";
+import { addQuizId } from "../features/topics/topicsSlice";
+
+export default function NewQuizForm() {
+  const [name, setName] = useState("");
+  const [cards, setCards] = useState([]);
+  const [topicId, setTopicId] = useState("");
+  const navigate = useNavigate();
+  const topics = useSelector(selectTopics);
+  const dispatch = useDispatch();
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (name.length === 0 || !topicId) {
+      return;
+    }
+
+    const quizId = uuidv4();
+    
+    // Create the quiz with empty cardIds array for now
+    dispatch(addQuiz({
+      id: quizId,
+      name: name,
+      topicId: topicId,
+      cardIds: [] // Passing empty array as specified in task
+    }));
+
+    // Associate quiz with its topic
+    dispatch(addQuizId({
+      quizId: quizId,
+      topicId: topicId
+    }));
+
+    navigate(ROUTES.quizzesRoute());
+  };
+
+  const addCardInputs = (e) => {
+    e.preventDefault();
+    setCards(cards.concat({ front: "", back: "" }));
+  };
+
+  const removeCard = (e, index) => {
+    e.preventDefault();
+    setCards(cards.filter((card, i) => index !== i));
+  };
+
+  const updateCardState = (index, side, value) => {
+    const newCards = cards.slice();
+    newCards[index][side] = value;
+    setCards(newCards);
+  };
+
+  return (
+    <section>
+      <h1>Create a new quiz</h1>
+      <form onSubmit={handleSubmit}>
+        <input
+          id="quiz-name"
+          value={name}
+          onChange={(e) => setName(e.currentTarget.value)}
+          placeholder="Quiz Title"
+        />
+        <select
+          id="quiz-topic"
+          onChange={(e) => setTopicId(e.currentTarget.value)}
+          placeholder="Topic"
+          value={topicId}
+        >
+          <option value="">Topic</option>
+          {Object.values(topics).map((topic) => (
+            <option key={topic.id} value={topic.id}>
+              {topic.name}
+            </option>
+          ))}
+        </select>
+        {cards.map((card, index) => (
+          <div key={index} className="card-front-back">
+            <input
+              id={`card-front-${index}`}
+              value={cards[index].front}
+              onChange={(e) =>
+                updateCardState(index, "front", e.currentTarget.value)
+              }
+              placeholder="Front"
+            />
+
+            <input
+              id={`card-back-${index}`}
+              value={cards[index].back}
+              onChange={(e) =>
+                updateCardState(index, "back", e.currentTarget.value)
+              }
+              placeholder="Back"
+            />
+
+            <button
+              onClick={(e) => removeCard(e, index)}
+              className="remove-card-button"
+            >
+              Remove Card
+            </button>
+          </div>
+        ))}
+        <div className="actions-container">
+          <button onClick={addCardInputs}>Add a Card</button>
+          <button type="submit">Create Quiz</button>
+        </div>
+      </form>
+    </section>
+  );
+}
+
+```
+
 ## Task 16.
 
 You previously passed an empty array for cardIds to the action creator that generates a new quiz. Now that you have written code to collect an array of all the cardIds created whenever the new quiz form is submitted, replace the empty array with this array of cardIds.
